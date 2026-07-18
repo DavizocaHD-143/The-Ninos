@@ -52,7 +52,6 @@ typedef struct {
 } client_c;//client config
 typedef struct {
 	char nick[32];
-	int id;
 	float x,y,z;
 	float dirx,diry,dirz;
 	mybool connected;
@@ -161,8 +160,7 @@ inline void multiplayer_run(client_c *c,internet_c *s){
 							c->id = receive.id; 
 							printf("Your ID: %i",c->id);
 						} else {
-							s->id = receive.id;
-							s->connected = receive.connected;
+							s[id]connected = receive.connected;
 							
 						}
 					}
@@ -182,18 +180,18 @@ inline void multiplayer_run(client_c *c,internet_c *s){
 
 				case 3:
 				{
-					packet_construct receive;
+					packet_pos receive;
 									memcpy(&receive, event.packet->data, sizeof(packet_pos));
 									int id = receive.id;
 
-									if (id != c->){
-										s[id]->x = receive.x;
-										s[id]->y = receive.y;
-										s[id]->z = receive.z;
+									if (id != c->id){
+										s[id].x = receive.x;
+										s[id].y = receive.y;
+										s[id].z = receive.z;
 
-										s[id]->dirx = receive.dirx;
-										s[id]->diry = receive.diry;
-										s[id]->dirz = receive.dirz;
+										s[id].dirx = receive.dirx;
+										s[id].diry = receive.diry;
+										s[id].dirz = receive.dirz;
 									}
 										
 

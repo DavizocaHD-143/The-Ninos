@@ -47,11 +47,12 @@ dpoint3d fallspd = {0.0,0.0,0.0};
 mysprite spr[MAXSPRITES];
 long numsprites = 0;
 
+long player_model_id = 0;
 double odtotclk,dtotclk;
 long totclk;
 float zoom = 0.55;
 mybool click_trex = false;
-mybool key_trex[3];
+mybool key_trex[4];
 mybool nomousefocus = false;
 mybool zooming = false;
 mybool f3info = false;
@@ -139,14 +140,14 @@ void construct(mouse *m){
 				setcube(hitpos.x,hitpos.y,hitpos.z,-1);
 				updatevxl();
 				if (enet == true && enet_configured == true){
-				packet_construct p;
-				p.action = 0;
-				p.x = hitpos.x;
-				p.y = hitpos.y;
-				p.z = hitpos.z;
-				p.color = build_colors[6].hex;
-				ENetPacket* send = enet_packet_create(&p, sizeof(packet_construct), ENET_PACKET_FLAG_RELIABLE);
-				enet_peer_send(peer,0,send);
+					packet_construct p;
+					p.action = 0;
+					p.x = hitpos.x;
+					p.y = hitpos.y;
+					p.z = hitpos.z;
+					p.color = build_colors[6].hex;
+					ENetPacket* send = enet_packet_create(&p, sizeof(packet_construct), ENET_PACKET_FLAG_RELIABLE);
+					enet_peer_send(peer,0,send);
 				}
 				click_trex = true;
 
@@ -170,14 +171,14 @@ void construct(mouse *m){
 				setcube(bx,by,bz,build_colors[colorid].hex);
 				updatevxl();
 				if (enet == true && enet_configured == true){
-				packet_construct p;
-				p.action = 1;
-				p.x = bx;
-				p.y = by;
-				p.z = bz;
-				p.color = build_colors[colorid].hex;
-				ENetPacket* send = enet_packet_create(&p, sizeof(packet_construct), ENET_PACKET_FLAG_RELIABLE);
-				enet_peer_send(peer,0,send);
+					packet_construct p;
+					p.action = 1;
+					p.x = bx;
+					p.y = by;
+					p.z = bz;
+					p.color = build_colors[colorid].hex;
+					ENetPacket* send = enet_packet_create(&p, sizeof(packet_construct), ENET_PACKET_FLAG_RELIABLE);
+					enet_peer_send(peer,0,send);
 				}
 				click_trex = true;
 
@@ -232,6 +233,8 @@ long initapp (long argc, char **argv)
 		targetpng.sy = yres / 2;
 	}
 
+	player_model_id = getkv6("voxdata/kv6/player.kv6");
+
 	for (int i = 0;i < 3;i++){
 		key_trex[i] = false;
 	}
@@ -259,11 +262,11 @@ void doframe ()
 
 	accumulator += frame_time;
 	if (!nomousefocus){
-	mouse m = {0.0f,0.0f,0.0f,0};	
-	readmouse(&m.x,&m.y,&m.z,&m.buttons);
+		mouse m = {0.0f,0.0f,0.0f,0};	
+		readmouse(&m.x,&m.y,&m.z,&m.buttons);
 
-	dorthorotate(0.0,m.y * 0.002,m.x * 0.002,&istr,&ihei,&ifor);
-	construct(&m);
+		dorthorotate(0.0,m.y * 0.002,m.x * 0.002,&istr,&ihei,&ifor);
+		construct(&m);
 	}
 	camera_fix();
 
@@ -277,25 +280,25 @@ void doframe ()
 	while (accumulator >= TIME_STEP) {
 		//ENET 
 		if (enet == true && enet_configured == true){
-		multiplayer_run(&loc_conf,mp_conf);
-		
+			multiplayer_run(&loc_conf,mp_conf);
 
-		float oldx = ipos.x,oldy = ipos.y,oldz = ipos.z,olddirx = ifor.x,olddiry = ifor.y,olddirz = ifor.z;	
-		
-		if (oldx != ipos.x || oldy != ipos.y || oldz != ipos.z || olddirx != ifor.x || olddiry != ifor.y || olddirz != ifor.z) {
-			packet_pos pc;
-			pc.type = 3;
-			pc.id = loc_conf.id
-			pc.x = ipos.x;
-			pc.y = ipos.y;
-			pc.z = ipos.z;
-			pc.dirx = ifor.x;
-			pc.diry = ifor.y;
-			pc.dirz = ifor.z;
-			ENetPacket* sends = enet_packet_create(&pc, sizeof(packet_pos), ENET_PACKET_FLAG_RELIABLE);
+
+			float oldx = ipos.x,oldy = ipos.y,oldz = ipos.z,olddirx = ifor.x,olddiry = ifor.y,olddirz = ifor.z;	
+
+			if (oldx != ipos.x || oldy != ipos.y || oldz != ipos.z || olddirx != ifor.x || olddiry != ifor.y || olddirz != ifor.z) {
+				packet_pos pc;
+				pc.type = 3;
+				pc.id = loc_conf.id;
+				pc.x = ipos.x;
+				pc.y = ipos.y;
+				pc.z = ipos.z;
+				pc.dirx = ifor.x;
+				pc.diry = ifor.y;
+				pc.dirz = ifor.z;
+				ENetPacket* sends = enet_packet_create(&pc, sizeof(packet_pos), ENET_PACKET_FLAG_RELIABLE);
 				enet_peer_send(peer,0,sends);
 
-		}
+			}
 		}
 
 		double speed = (keystatus[0x2a]) ? 0.05 : 0.02;
@@ -402,28 +405,46 @@ void doframe ()
 			}
 
 		} else {key_trex[0] = false;}
-		
+
 		//f1
 		if (keystatus[0x3b]){
 			if (enet == false){
 				enet = true;
 			}
-			
+
 		}
 
 		//f6 mouse
-		if (GetAsyncKeyState(VK_F6) & 1){
-			nomousefocus = !nomousefocus;
+		if (keystatus[0x40]){
+			if (key_trex[3] == false) {
+				nomousefocus = !nomousefocus;
+				key_trex[3] = true;
 
-			if (!nomousefocus){
-				while(ShowCursor(TRUE) < 0);
+				if (nomousefocus) {
+					setacquire(0,0);
+					ClipCursor(NULL);
+					ReleaseCapture();
+					while (ShowCursor(TRUE) < 0);
+				} else {
+					setacquire(1,1);
+					RECT rect;
+					if (GetWindowRect(ghwnd , &rect)) {
+						ClipCursor(&rect);
+					}
+					while (ShowCursor(FALSE) >= 0);
+				}
 
-				ClipCursor(NULL);
-			} else { while (ShowCursor(FALSE) >= 0);
+
 			}
+
+		} else {
+			key_trex[3] = false;
 		}
 
-		
+
+
+
+
 
 		//up
 		if (keystatus[0xc8]){
@@ -493,22 +514,47 @@ void doframe ()
 		}
 	}
 
-	for (int i =
+	for (int i = 0;i < MAX_PLAYERS; i++){
+if (mp_conf[i].connected == true && i != loc_conf.id){
+	vx5sprite playerspr;
 
-	//f3 screenshot
-	if (keystatus[0x3d]){
-		screencapture32bit("screenshot.png");
-	}
+	playerspr.p.x = mp_conf[i].x;
+	playerspr.p.y = mp_conf[i].y;
+	playerspr.p.z = mp_conf[i].z;
 
-	stopdirectdraw();
-	nextpage();
+	playerspr.f.x = mp_conf[i].dirx;
+	playerspr.f.y = mp_conf[i].diry;
+	playerspr.f.z = mp_conf[i].dirz;
 
-	Sleep(1);
-	if (keystatus[1]) quitloop();
+	playerspr.s.x = -mp_conf[i].diry;
+	playerspr.s.y = mp_conf[i].dirx;
+	playerspr.s.z = 0.0f;
+
+	playerspr.h.x = 0.0f;
+	playerspr.h.y = 0.0f;
+	playerspr.h.z = 1.0f;
+
+	playerspr.voxnum = player_model_id;
+
+	drawsprite(&playerspr);
+
+}
 }
 
-void uninitapp () {  /*uninitvoxlap();*/ }
+			//f3 screenshot
+			if (keystatus[0x3d]){
+			screencapture32bit("screenshot.png");
+			}
+
+			stopdirectdraw();
+			nextpage();
+
+			Sleep(1);
+			if (keystatus[1]) quitloop();
+			}
+
+			void uninitapp () {  /*uninitvoxlap();*/ }
 
 
 
-//¨
+			//¨
