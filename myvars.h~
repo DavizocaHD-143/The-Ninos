@@ -1,0 +1,81 @@
+#ifndef __MYVARS_H
+#define __MYVARS_H
+
+#include <stdlib.h>
+#include "voxlap5.h"
+
+typedef int mybool;
+#define true 1
+#define false 0
+
+typedef struct {
+	int hex;
+} myhex;
+
+typedef struct{
+	char *buffer;
+	long size;
+	long ptr;
+	int x;
+	int y;
+	long screenx;
+	long screeny;
+} mypng;
+
+inline int myloadpng(const char *file, mypng *arq) {
+	arq->buffer = NULL;
+	arq->size = 0;
+	arq->ptr = 0;
+
+	long handle = kzopen(file);
+	if (!handle) {
+			return -1;
+			}
+
+	arq->size = kzfilelength();
+	if (arq->size <= 0) {
+		return -1;
+	}
+
+	arq->buffer = (char *)malloc(arq->size);
+	if (!arq->buffer) {
+		return -1;
+	}
+
+	kzread(arq->buffer,arq->size);
+
+		
+
+		kpgetdim(arq->buffer,arq->size,&arq->x,&arq->y);
+
+		arq->ptr = (long)malloc(arq->x * arq->y * 4);
+		if (arq->ptr != 0) {
+			kprender(
+					arq->buffer,
+					arq->size,
+					arq->ptr,
+					arq->x * 4,
+					arq->x,
+					arq->y,
+					0,0
+				);
+		
+			
+		} else {
+		free(arq->buffer);
+		arq->buffer = NULL;
+		return -1;
+		}
+
+		free(arq->buffer);
+		arq->buffer = NULL;
+	
+
+	return 1;
+}
+	
+
+
+
+
+#endif

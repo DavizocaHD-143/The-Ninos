@@ -1,0 +1,56 @@
+Portugues BR
+Para compilar o voxlap voce precisara dessas ferramentas
+
+Microsoft Visual Studio C++ 6.0 (MSVC6)
+Microsoft Platform SDK for Windows XP SP2 (SDK)
+Visual C++ Toolkit 2003 
+
+quando voce instalar esses 3 voce vai no mymakestuff.bat e coloca o caminho do
+msvc6 e do sdk no 
+
+set MSVC6_PATH=
+set SDK_PATH=
+
+os arquivos do seu jogo no 
+set GAME_FILES=
+
+nome do exe no 
+set EXE_NAME=
+
+Depois abra o Visual C++ Toolkit 2003 Command Prompt
+
+de cd "caminho da pasta do seu jogo"
+e arraste o mymakestuff.bat pro command prompt
+e aperte enter
+
+se der tudo certo ele vai compilar !!
+
+
+
+
+English
+To compile voxlap you will need these tools
+
+Microsoft Visual Studio C++ 6.0 (MSVC6)
+Microsoft Platform SDK for Windows XP SP2 (SDK)
+Visual C++ Toolkit 2003 
+
+when you install these 3 you go to mymakestuff.bat and put the path of
+msvc6 and the SDK in
+
+set MSVC6_PATH=
+set SDK_PATH=
+
+your game files in 
+set GAME_FILES=
+
+exe name in 
+set EXE_NAME=
+
+Then open the Visual C++ Toolkit 2003 Command Prompt
+
+do cd "your game folder path"
+and drag mymakestuff.bat to the command prompt
+and press enter
+
+If everything goes well it will compile!!
