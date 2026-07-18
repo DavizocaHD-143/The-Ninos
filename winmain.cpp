@@ -84,7 +84,7 @@ HINSTANCE ghinst, ghpinst;
 LPSTR gcmdline;
 int gncmdshow;
 
-long ActiveApp = 1, alwaysactive = 0;
+long ActiveApp = 1, alwaysactive = 1;
 long xres = 640, yres = 480, colbits = 32, fullscreen = 0, maxpages = 8;
 
 	// Note! Without clipper blit is faster but only with software bliter

@@ -20,6 +20,3 @@ KEY_UP And KEY_DOWN to select block colors
 
 Left_Mouse_Button delete blocks
 Right_Mouse_Button place selected color block
-
-map in voxdata/vxl/untiled.vxl
-

@@ -1,0 +1,8 @@
+*.exe
+KPLIB.obj
+main.obj
+VOXLAP5.obj
+WINMAIN.obj
+*.swp
+*~
+
